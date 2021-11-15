@@ -5,7 +5,7 @@
 #![reexport_test_harness_main = "test_main"]
 
 use core::panic::PanicInfo;
-use jadro::{print, exit_qemu, QemuExitCode};
+use jadro::{print, serial_print, interrupts, exit_qemu, QemuExitCode};
 
 /// Setup panic handlers
 #[cfg(not(test))]
@@ -25,9 +25,13 @@ fn panic(info: &PanicInfo) -> ! {
 pub extern "C" fn _start() -> !{
     print!("Wake UP, {}\n", "NEO!");
 
+    interrupts::init();
+
+    serial_print!("fuck!\n");
     //#[cfg(test)]
     //test_main();
     exit_qemu(QemuExitCode::Success);
 
     loop {}
 }
+

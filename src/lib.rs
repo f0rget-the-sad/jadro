@@ -3,9 +3,11 @@
 #![feature(custom_test_frameworks)]
 #![test_runner(crate::test_runner)]
 #![reexport_test_harness_main = "test_main"]
+#![feature(asm)]
 
 pub mod vga_buffer;
 pub mod serial;
+pub mod interrupts;
 
 use core::panic::PanicInfo;
 
@@ -68,5 +70,15 @@ pub fn exit_qemu(code: QemuExitCode) {
     unsafe {
         let mut port = Port::new(ISA_DEBUG_EXIT_IOBASE);
         port.write(code as u32);
+    }
+}
+
+pub fn divide_by_zero() {
+    unsafe {
+        asm!(
+            "mov eax, 0x69",
+            "mov ecx, 0x0",
+            "div ecx",
+        );
     }
 }
