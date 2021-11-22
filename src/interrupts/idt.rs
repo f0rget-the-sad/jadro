@@ -87,6 +87,9 @@ impl EntryOptions {
 
 pub struct Idt([Entry; 16]);
 
+/// Interrupt Descriptor Table
+/// https://wiki.osdev.org/Interrupt_Descriptor_Table
+/// https://wiki.osdev.org/Exceptions
 impl Idt {
     pub fn new() -> Idt {
         Idt([Entry::missing(); 16])

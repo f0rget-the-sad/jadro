@@ -4,6 +4,10 @@
 #![test_runner(crate::test_runner)]
 #![reexport_test_harness_main = "test_main"]
 #![feature(asm)]
+#![feature(llvm_asm)]
+#![feature(core_intrinsics)]
+#![feature(naked_functions)]
+#![feature(asm_sym)]
 
 pub mod vga_buffer;
 pub mod serial;

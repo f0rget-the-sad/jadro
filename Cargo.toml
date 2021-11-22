@@ -20,6 +20,7 @@ spin = "0.5.2"
 x86_64 = "0.14.2"
 uart_16550 = "0.2.0"
 bit_field = "0.10.1"
+bitflags = "*"
 
 [package.metadata.bootimage]
 test-args = [
@@ -31,10 +32,19 @@ test-success-exit-code = 33         # (0x10 << 1) | 1
 test-timeout = 5          # (in seconds)
 
 
+# TODO: mange this as list
 [[test]]
 name = "should_panic"
 harness = false
 
 [[test]]
 name = "exeptions_0_divide_by_zero"
+harness = false
+
+[[test]]
+name = "exeptions_6_invalid_opcode"
+harness = false
+
+[[test]]
+name = "exeptions_14_page_fault"
 harness = false
