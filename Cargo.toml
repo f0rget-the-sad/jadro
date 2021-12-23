@@ -42,6 +42,10 @@ name = "exeptions_0_divide_by_zero"
 harness = false
 
 [[test]]
+name = "exeptions_3_breakpoint"
+harness = false
+
+[[test]]
 name = "exeptions_6_invalid_opcode"
 harness = false
 

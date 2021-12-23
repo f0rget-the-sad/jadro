@@ -45,6 +45,7 @@ lazy_static! {
     static ref IDT: idt::Idt = {
         let mut idt = idt::Idt::new();
         idt.set_handler(0, handler!(divide_by_zero_handler));
+        idt.set_handler(3, handler!(breakpoint_handler));
         idt.set_handler(6, handler!(invalid_opcode_handler));
         idt.set_handler(14, handler_with_error_code!(page_fault_handler));
         idt
@@ -88,6 +89,13 @@ extern "C" fn page_fault_handler(
     loop {}
 }
 
+extern "C" fn breakpoint_handler(stack_frame: &ExceptionStackFrame) -> !
+{
+    let stack_frame = &*stack_frame;
+    serial_print!("\nEXCEPTION: BREAKPOINT at {:#x}\n{:#?}\n",
+        stack_frame.instruction_pointer, stack_frame);
+    loop {}
+}
 pub fn init() {
     IDT.load();
     serial_print!("IDT LOADED\n");
