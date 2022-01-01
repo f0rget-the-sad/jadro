@@ -13,7 +13,10 @@ macro_rules! handler {
                     "mov rdi, rsp",
                     "sub rsp, 8", // align the stack pointer
                     "call {}",
-                    sym $name,
+                    sym $name);
+                asm!(
+                    "add rsp, 8", // undo stack pointer alignment
+                    "iretq",
                     options(noreturn)
                 );
             }
@@ -53,17 +56,24 @@ lazy_static! {
 }
 
 
-extern "C" fn divide_by_zero_handler(stack_frame: &ExceptionStackFrame) -> ! {
+extern "C" fn divide_by_zero_handler(stack_frame: &ExceptionStackFrame) {
     serial_print!("EXCEPTION: DIVIDE BY ZERO\n{:#?}\n", stack_frame);
     exit_qemu(QemuExitCode::Success);
     loop {}
 }
 
-extern "C" fn invalid_opcode_handler(stack_frame: &ExceptionStackFrame) -> ! {
+extern "C" fn invalid_opcode_handler(stack_frame: &ExceptionStackFrame) {
     serial_print!("EXCEPTION: INVALID OPCODE at {:#x}\n {:#?}\n",
         stack_frame.instruction_pointer, stack_frame);
     exit_qemu(QemuExitCode::Success);
     loop {}
+}
+
+extern "C" fn breakpoint_handler(stack_frame: &ExceptionStackFrame) {
+    serial_print!("\nEXCEPTION: BREAKPOINT at {:#x}\n{:#?}\n",
+        stack_frame.instruction_pointer, stack_frame);
+    exit_qemu(QemuExitCode::Success);
+    //loop {}
 }
 
 bitflags! {
@@ -89,13 +99,6 @@ extern "C" fn page_fault_handler(
     loop {}
 }
 
-extern "C" fn breakpoint_handler(stack_frame: &ExceptionStackFrame) -> !
-{
-    let stack_frame = &*stack_frame;
-    serial_print!("\nEXCEPTION: BREAKPOINT at {:#x}\n{:#?}\n",
-        stack_frame.instruction_pointer, stack_frame);
-    loop {}
-}
 pub fn init() {
     IDT.load();
     serial_print!("IDT LOADED\n");
